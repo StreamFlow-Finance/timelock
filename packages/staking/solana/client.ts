@@ -236,7 +236,10 @@ export class SolanaStakingClient {
 
     const stakePoolPDA = deriveStakePoolPDA(stakePoolProgram.programId, pk(mint), creator, nonce);
 
-    return { ixs: [createInstruction], publicKey: stakePoolPDA };
+    return {
+      ixs: [...prepareBaseInstructions(this.connection, extParams), createInstruction],
+      publicKey: stakePoolPDA,
+    };
   }
 
   async stake(data: StakeArgs, extParams: IInteractSolanaExt): Promise<ITransactionResult> {
@@ -273,7 +276,7 @@ export class SolanaStakingClient {
       })
       .instruction();
 
-    return { ixs: [instruction] };
+    return { ixs: [...prepareBaseInstructions(this.connection, extParams), instruction] };
   }
 
   async unstake(data: UnstakeArgs, extParams: IInteractSolanaExt): Promise<ITransactionResult> {
@@ -310,7 +313,7 @@ export class SolanaStakingClient {
       })
       .instruction();
 
-    return { ixs: [instruction] };
+    return { ixs: [...prepareBaseInstructions(this.connection, extParams), instruction] };
   }
 
   async createRewardPool(data: CreateRewardPoolArgs, extParams: IInteractSolanaExt): Promise<CreationResult> {
@@ -352,7 +355,7 @@ export class SolanaStakingClient {
 
     const rewardPoolKey = deriveRewardPoolPDA(rewardPoolProgram.programId, pk(stakePool), pk(rewardMint), nonce);
 
-    return { publicKey: rewardPoolKey, ixs: [instruction] };
+    return { publicKey: rewardPoolKey, ixs: [...prepareBaseInstructions(this.connection, extParams), instruction] };
   }
 
   async claimRewards(data: ClaimRewardPoolArgs, extParams: IInteractSolanaExt): Promise<ITransactionResult> {
@@ -383,7 +386,7 @@ export class SolanaStakingClient {
       })
       .instruction();
 
-    return { ixs: [instruction] };
+    return { ixs: [...prepareBaseInstructions(this.connection, extParams), instruction] };
   }
 
   async fundPool(data: FundPoolArgs, extParams: IInteractSolanaExt): Promise<ITransactionResult> {
@@ -430,7 +433,10 @@ export class SolanaStakingClient {
       })
       .instruction();
 
-    return { ixs: treasuryATA ? treasuryATA.concat([instruction]) : [instruction] };
+    const instructions = [...prepareBaseInstructions(this.connection, extParams), instruction];
+    return {
+      ixs: treasuryATA ? treasuryATA.concat(instructions) : instructions,
+    };
   }
 
   async createRewardEntry(data: CreateRewardEntryArgs, extParams: IInteractSolanaExt): Promise<ITransactionResult> {
@@ -460,7 +466,7 @@ export class SolanaStakingClient {
       })
       .instruction();
 
-    return { ixs: [instruction] };
+    return { ixs: [...prepareBaseInstructions(this.connection, extParams), instruction] };
   }
 
   async updateRewardPool(data: UpdateRewardPoolArgs, extParams: IInteractSolanaExt) {
@@ -489,7 +495,7 @@ export class SolanaStakingClient {
       })
       .instruction();
 
-    return { ixs: [instruction] };
+    return { ixs: [...prepareBaseInstructions(this.connection, extParams), instruction] };
   }
 
   decode<
